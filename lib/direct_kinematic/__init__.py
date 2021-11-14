@@ -1,6 +1,6 @@
 import numpy as np
 
-from lib.frame import rotate_x, rotate_z, translate, Frame
+from lib.frame import x_rotation_matrix, z_rotation_matrix, translation_matrix, Frame
 from prettytable import PrettyTable
 
 # homogeneous transformation matrix from a generic robot
@@ -13,10 +13,10 @@ class Link:
     self.A = self.compute_link_htm()
     
   def compute_link_htm(self):
-    rz = rotate_z(self.dhp[0])
-    tz = translate(0, 0, self.dhp[1])
-    tx = translate(self.dhp[2], 0, 0)
-    rx = rotate_x(self.dhp[3])
+    rz = z_rotation_matrix(self.dhp[0])
+    tz = translation_matrix(0, 0, self.dhp[1])
+    tx = translation_matrix(self.dhp[2], 0, 0)
+    rx = x_rotation_matrix(self.dhp[3])
   
     return rz @ tz @ tx @ rx
 

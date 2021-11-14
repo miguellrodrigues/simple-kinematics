@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt, animation
 from lib.arrow3d import Arrow3D
 
 
-def rotate_x(yaw):
+def x_rotation_matrix(yaw):
   """
   Rotation matrix around the x axis
   """
@@ -14,7 +14,7 @@ def rotate_x(yaw):
                    [0, 0, 0, 1]])
 
 
-def rotate_y(pitch):
+def y_rotation_matrix(pitch):
   """
   Rotation matrix around the y axis
   """
@@ -24,7 +24,7 @@ def rotate_y(pitch):
                    [0, 0, 0, 1]])
 
 
-def rotate_z(roll):
+def z_rotation_matrix(roll):
   """
   Rotation matrix around the z axis
   """
@@ -34,14 +34,14 @@ def rotate_z(roll):
                    [0, 0, 0, 1]])
 
 
-def rotate_x_y_z(yaw, pitch, roll):
+def x_y_z_rotation_matrix(yaw, pitch, roll):
   """
   Rotation matrix around the x, y and z axis
   """
-  return rotate_x(yaw).dot(rotate_y(pitch)).dot(rotate_z(roll))
+  return x_rotation_matrix(yaw).dot(y_rotation_matrix(pitch)).dot(z_rotation_matrix(roll))
 
 
-def rotate_around_arbitrary_vector(theta, v):
+def arbitrary_vector_rotation_matrix(theta, v):
   """
   Rotation matrix around an arbitrary vector
   """
@@ -54,7 +54,7 @@ def rotate_around_arbitrary_vector(theta, v):
   return np.eye(4) + v_x + np.dot(v_x, v_x) * (1 - np.cos(theta))
 
 
-def translate(dx, dy, dz):
+def translation_matrix(dx, dy, dz):
   return np.array([
     [1, 0, 0, dx],
     [0, 1, 0, dy],
@@ -63,7 +63,7 @@ def translate(dx, dy, dz):
 
 
 class Frame:
-  def __init__(self, x, y, z):
+  def __init__(self, x, y, z, yaw=0, pitch=0, roll=0):
     self.position = np.array([
       [1, 0, 0, x],
       [0, 1, 0, y],
@@ -71,19 +71,18 @@ class Frame:
       [0, 0, 0, 1]
     ])
     
-    self.rotation = np.eye(4)
+    self.rotation = x_y_z_rotation_matrix(yaw, pitch, roll)
   
   def translate(self, dx, dy, dz):
-    self.position = translate(dx, dy, dz) @ self.position
+    self.position = translation_matrix(dx, dy, dz) @ self.position
     
     return self.position
   
   def rotate(self, yaw, pitch, roll):
-    self.rotation = rotate_x_y_z(yaw, pitch, roll) @ self.rotation
-    return self.rotation
+    self.rotation = x_y_z_rotation_matrix(yaw, pitch, roll) @ self.rotation
   
   def rotate_around_arbitrary_vector(self, theta, v):
-    self.rotation = rotate_around_arbitrary_vector(theta, v) @ self.rotation
+    self.rotation = arbitrary_vector_rotation_matrix(theta, v) @ self.rotation
   
   def get_x_component(self):
     return self.position[0, 3]
@@ -93,6 +92,9 @@ class Frame:
   
   def get_z_component(self):
     return self.position[2, 3]
+  
+  def rotation_matrix(self):
+    return self.rotation
   
   def translate_to(self, other, p=.01):
     dx = other.get_x_component() - self.get_x_component()
@@ -106,16 +108,14 @@ class Frame:
     )
     
     return np.linalg.norm([dx, dy, dz])
-
-  def rotation_matrix(self):
-    return self.rotation
   
   def rotation_to(self, other):
     yaw = np.arctan2(other.rotation[2, 1], other.rotation[2, 2]) - np.arctan2(self.rotation[2, 1], self.rotation[2, 2])
-    pitch = np.arctan2(other.rotation[2, 0], other.rotation[2, 2]) - np.arctan2(self.rotation[2, 0], self.rotation[2, 2])
+    pitch = np.arctan2(other.rotation[2, 0], other.rotation[2, 2]) - np.arctan2(self.rotation[2, 0],
+                                                                                self.rotation[2, 2])
     roll = np.arctan2(other.rotation[1, 0], other.rotation[0, 0]) - np.arctan2(self.rotation[1, 0], self.rotation[0, 0])
     
-    return [yaw, pitch, roll]
+    return np.array([yaw, pitch, roll])
   
   def get_frame_cords(self):
     x, y, z = [
@@ -192,12 +192,13 @@ class FrameDrawer:
     for frame in self.frames:
       frame.draw(self.ax)
   
-  def show(self):
+  def show(self, save_animation=False):
     self.plot()
     
     if self.update:
       ani = animation.FuncAnimation(self.fig, self.animate, 200, interval=1, blit=False)
-      # ani.save('animation.gif', fps=60, dpi=300)
+      if save_animation:
+        ani.save('animation.gif', fps=60, dpi=300)
     
     plt.show()
   
