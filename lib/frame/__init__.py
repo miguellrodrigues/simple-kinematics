@@ -64,12 +64,7 @@ def translation_matrix(dx, dy, dz):
 
 class Frame:
   def __init__(self, x, y, z, yaw=0, pitch=0, roll=0):
-    self.position = np.array([
-      [1, 0, 0, x],
-      [0, 1, 0, y],
-      [0, 0, 1, z],
-      [0, 0, 0, 1]
-    ])
+    self.position = translation_matrix(x, y, z)
     
     self.rotation = x_y_z_rotation_matrix(yaw, pitch, roll)
   
