@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt, animation
 
 from lib.arrow3d import Arrow3D
 
@@ -69,9 +69,7 @@ class Frame:
   def get_z_component(self):
     return self.translation[2, 3]
   
-  def draw(self, fig, ax):
-    arrow_prop_dict = dict(mutation_scale=40, arrowstyle='->', shrinkA=0, shrinkB=0)
-    
+  def get_frame_cords(self):
     x, y, z = [
       self.get_x_component(),
       self.get_y_component(),
@@ -96,32 +94,68 @@ class Frame:
       [z, z + self.translation[2, 2]]
     ]
     
+    return [_x, _y, _z]
+  
+  def create_frame_arrows(self):
+    arrow_prop_dict = dict(mutation_scale=40, arrowstyle='->', shrinkA=0, shrinkB=0)
+    
+    x, y, z = self.get_frame_cords()
+    
     x_arr = Arrow3D(
-      _x[0],
-      _x[1],
-      _x[2],
+      x[0],
+      x[1],
+      x[2],
       **arrow_prop_dict, color='r')
     
     y_arr = Arrow3D(
-      _y[0],
-      _y[1],
-      _y[2],
+      y[0],
+      y[1],
+      y[2],
       **arrow_prop_dict, color='g')
     
     z_arr = Arrow3D(
-      _z[0],
-      _z[1],
-      _z[2],
+      z[0],
+      z[1],
+      z[2],
       **arrow_prop_dict, color='b')
     
-    ax.add_artist(x_arr)
-    ax.add_artist(y_arr)
-    ax.add_artist(z_arr)
+    return [x_arr, y_arr, z_arr]
+  
+  def draw(self, ax):
+    arrows = self.create_frame_arrows()
     
-    ax.text(x, y, z, r'$o$')
-    ax.text(_x[0][1], _x[1][1], _x[2][1], r'$x$')
-    ax.text(_y[0][1], _y[1][1], _y[2][1], r'$y$')
-    ax.text(_z[0][1], _z[1][1], _z[2][1], r'$z$')
+    ax.add_artist(arrows[0])
+    ax.add_artist(arrows[1])
+    ax.add_artist(arrows[2])
+
+
+class FrameDrawer:
+  def __init__(self, frames, update_func=None):
+    self.frames = frames
     
-    ax.view_init(azim=-90, elev=90)
-    ax.set_axis_off()
+    self.fig = plt.figure()
+    self.ax = self.fig.add_subplot(111, projection='3d')
+    self.ax.view_init(azim=41, elev=38)
+    self.ax.set_axis_off()
+    
+    self.update = update_func
+
+  def plot(self):
+    for frame in self.frames:
+      frame.draw(self.ax)
+      
+  def show(self):
+    self.plot()
+    
+    if self.update:
+      ani = animation.FuncAnimation(self.fig, self.animate, 200, interval=1, blit=False)
+      ani.save('animation.gif', fps=60, dpi=300)
+    
+    plt.show()
+
+  def animate(self, num):
+    self.ax.artists.clear()
+    self.update()
+    self.plot()
+
+    
