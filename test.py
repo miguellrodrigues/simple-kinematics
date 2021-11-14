@@ -1,7 +1,7 @@
 import numpy as np
 
 from lib.direct_kinematic import Joint, DirectKinematic
-from lib.frame import FrameDrawer
+# from lib.frame import FrameDrawer
 
 j0 = Joint([np.radians(45), 0, 2, 0])
 j1 = Joint([np.radians(45), 0, 1.5, np.pi])

@@ -20,8 +20,9 @@ class Joint:
   
     return rz @ tz @ tx @ rx
 
-  def update_joint_htm(self, theta):
-    self.dhp[0] = theta
+  def update_joint_htm(self, i, v):
+    self.dhp[i] = v
+    
     self.A = self.compute_joint_htm()
 
 
@@ -44,7 +45,7 @@ class DirectKinematic:
     return np.array([joint.dhp[0] for joint in self.joints])
 
   def set_theta(self, joint, theta):
-    self.joints[joint].update_joint_htm(theta)
+    self.joints[joint].update_joint_htm(0, theta)
     
     self.htm = self.compute_htm()
 
