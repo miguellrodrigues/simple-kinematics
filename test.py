@@ -1,35 +1,15 @@
 import numpy as np
 
-from lib.direct_kinematic import Joint, DirectKinematic
-# from lib.frame import FrameDrawer
+from lib.direct_kinematic import Link, DirectKinematic
 
-j0 = Joint([np.radians(45), 0, 2, 0])
-j1 = Joint([np.radians(45), 0, 1.5, np.pi])
-j2 = Joint([0, 2, 0, 0])
-j3 = Joint([np.radians(90), .8, 0, 0])
+j0 = Link([0, 4.5, 1.5, -np.pi / 2])
+j1 = Link([-np.pi / 2, 0, 5.1, 0])
+j2 = Link([0, 0, 1.3, np.pi / 2])
+j3 = Link([0, -6.47, 0, -np.pi / 2])
+j4 = Link([0, 0, 0, np.pi / 2])
+j5 = Link([np.pi, -.95, 0, np.pi])
 
-dk = DirectKinematic([j0, j1, j2, j3])
+dk = DirectKinematic([j0, j1, j2, j3, j4, j5])
 dk.print()
 
 print(dk.get_htm())
-
-# f1 = dk.get_joint_frame(0)
-# f2 = dk.get_joint_frame(1)
-# f3 = dk.get_joint_frame(2)
-# f4 = dk.get_joint_frame(3)
-#
-#
-# def update():
-#   theta = dk.get_theta()[0]
-#
-#   if theta < 1.57:
-#     dk.set_theta(0, theta + 0.001)
-#
-#   f1.data = dk.get_joint_frame(0).data
-#   f2.data = dk.get_joint_frame(1).data
-#   f3.data = dk.get_joint_frame(2).data
-#   f4.data = dk.get_joint_frame(3).data
-#
-#
-# drawer = FrameDrawer([f1, f2, f3, f4], update)
-# drawer.show()

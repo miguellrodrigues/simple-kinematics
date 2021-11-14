@@ -142,7 +142,7 @@ class FrameDrawer:
     
     self.fig = plt.figure()
     self.ax = self.fig.add_subplot(111, projection='3d')
-    self.ax.view_init(azim=-90, elev=-3)
+    self.ax.view_init(azim=-40, elev=70)
     self.ax.set_axis_off()
     
     self.update = update_func
@@ -156,7 +156,7 @@ class FrameDrawer:
     
     if self.update:
       ani = animation.FuncAnimation(self.fig, self.animate, 200, interval=1, blit=False)
-      # ani.save('animation.gif', fps=30, dpi=300)
+      ani.save('animation.gif', fps=60, dpi=300)
     
     plt.show()
   
