@@ -56,13 +56,13 @@ class DirectKinematic:
     frame = Frame(0, 0, 0)
     
     if link == 0:
-      frame.data = self.links[0].A
+      frame.position = self.links[0].A
     elif link == len(self.links) - 1:
-      frame.data = self.htm
+      frame.position = self.htm
     else:
       for i in range(0, link):
-        frame.data = frame.data @ self.links[i].A
-      frame.data = np.linalg.inv(frame.data)
+        frame.position = frame.position @ self.links[i].A
+      frame.position = np.linalg.inv(frame.position)
     
     return frame
 

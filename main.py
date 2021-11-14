@@ -1,15 +1,17 @@
 from math import radians
 
-from lib.frame import Frame, FrameDrawer
+import numpy as np
+
+from lib.frame import Frame, FrameDrawer, rotate_around_arbitrary_vector
 
 zero = Frame(0, 0, 0)
+f1 = Frame(1, 1, 0)
 
-f1 = Frame(0, 0, 0)
+f1.rotate(0, 0, 1)
 
+print(f1.get_x_component(),
+      f1.get_y_component(),
+      f1.get_z_component())
 
-def update():
-  zero.rotate(0, 0, radians(1))
-  
-
-drawer = FrameDrawer([zero, f1], update)
+drawer = FrameDrawer([zero, f1])
 drawer.show()
