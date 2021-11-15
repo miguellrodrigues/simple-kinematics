@@ -53,16 +53,31 @@ class DirectKinematic:
     self.htm = self.compute_htm()
 
   def get_link_frame(self, link):
-    frame = Frame(0, 0, 0)
+    frame = Frame(0, 0, 0, name=f'link{link}')
     
     if link == 0:
-      frame.position = self.links[0].A
+      frame.translate(self.links[0].A[0][3],
+                      self.links[0].A[1][3],
+                      self.links[0].A[2][3])
+
+      frame.rotation = self.links[0].A[0:3, 0:3]
     elif link == len(self.links) - 1:
-      frame.position = self.htm
+      frame.translate(self.htm[0][3],
+                      self.htm[0][3],
+                      self.htm[2][3])
+      
+      frame.rotation = self.htm[0:3, 0:3]
     else:
-      for i in range(0, link):
-        frame.position = frame.position @ self.links[i].A
-      frame.position = np.linalg.inv(frame.position)
+      A = self.links[0].A
+      
+      for i in range(1, link):
+        A = A @ self.links[i].A
+
+      frame.translate(A[0][3],
+                      A[1][3],
+                      A[2][3])
+
+      frame.rotation = A[0:3, 0:3]
     
     return frame
 
@@ -70,7 +85,8 @@ class DirectKinematic:
     t = PrettyTable(['link', 'theta', 'd', 'a', 'alpha'])
 
     for i, link in enumerate(self.links):
-      t.add_row([f'{i + 1}', link.dhp[0], link.dhp[1], link.dhp[2], link.dhp[3]])
+      dhp = np.round(link.dhp, 6)
+      t.add_row([f'{i + 1}', dhp[0], dhp[1], dhp[2], dhp[3]])
     
     print(' ')
     print(t)

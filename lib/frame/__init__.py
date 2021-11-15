@@ -63,10 +63,12 @@ def translation_matrix(dx, dy, dz):
 
 
 class Frame:
-  def __init__(self, x, y, z, yaw=0, pitch=0, roll=0):
+  def __init__(self, x, y, z, yaw=0, pitch=0, roll=0, name=''):
     self.position = translation_matrix(x, y, z)
     
     self.rotation = x_y_z_rotation_matrix(yaw, pitch, roll)
+    
+    self.name = name
   
   def translate(self, dx, dy, dz):
     self.position = translation_matrix(dx, dy, dz) @ self.position
@@ -111,6 +113,10 @@ class Frame:
     roll = np.arctan2(other.rotation[1, 0], other.rotation[0, 0]) - np.arctan2(self.rotation[1, 0], self.rotation[0, 0])
     
     return np.array([yaw, pitch, roll])
+  
+  def a(self, other):
+    self.position = other.position
+    self.rotation = other.rotation
   
   def get_frame_cords(self):
     x, y, z = [
@@ -170,6 +176,13 @@ class Frame:
     ax.add_artist(arrows[0])
     ax.add_artist(arrows[1])
     ax.add_artist(arrows[2])
+    
+    ax.text(
+      self.get_x_component(),
+      self.get_y_component(),
+      self.get_z_component(),
+      f'{self.name}'
+    )
 
 
 class FrameDrawer:
@@ -178,7 +191,7 @@ class FrameDrawer:
     
     self.fig = plt.figure()
     self.ax = self.fig.add_subplot(111, projection='3d')
-    self.ax.view_init(azim=-40, elev=70)
+    self.ax.view_init(azim=-150, elev=-150)
     self.ax.set_axis_off()
     
     self.update = update_func
@@ -197,7 +210,8 @@ class FrameDrawer:
     
     plt.show()
   
-  def animate(self, num):
+  def animate(self, i):
     self.ax.artists.clear()
+    self.ax.texts.clear()
     self.update()
     self.plot()
