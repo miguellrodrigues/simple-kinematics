@@ -187,11 +187,11 @@ class Frame:
 
 class FrameDrawer:
   def __init__(self, frames, update_func=None):
-    self.frames = frames
+    self.frames = [Frame(0, 0, 0, name='origin'), *frames]
     
     self.fig = plt.figure()
     self.ax = self.fig.add_subplot(111, projection='3d')
-    self.ax.view_init(azim=-150, elev=-150)
+    self.ax.view_init(azim=-100, elev=30)
     self.ax.set_axis_off()
     
     self.update = update_func

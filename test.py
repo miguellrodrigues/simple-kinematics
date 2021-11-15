@@ -1,6 +1,7 @@
 import numpy as np
 
 from lib.direct_kinematic import Link, DirectKinematic
+from lib.frame import FrameDrawer
 
 l2 = .2
 l3 = .15
@@ -19,3 +20,6 @@ dk.print()
 
 print(np.round(dk.get_htm(), 6))
 
+drawer = FrameDrawer([dk.get_link_frame(i) for i in range(4)])
+
+drawer.show()
